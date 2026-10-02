@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>FITS 裁切工作台</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">FITS 裁切工作台</div>
+    <div class="uploader">
+      <input type="file" id="file-input" accept=".fits,.fit,.fts" hidden />
+      <button id="pick-btn" type="button">选择 FITS 文件</button>
+      <button id="sample-btn" type="button" class="secondary">载入代码生成样本（Int16，含旋转/BLANK）</button>
+      <button id="sample-float-btn" type="button" class="secondary">载入 Float32 样本（RA=0/NaN）</button>
+      <span id="upload-hint" class="hint">仅在本机本次会话内存中处理</span>
+    </div>
+    <div class="tools">
+      <div class="seg" role="tablist">
+        <button type="button" id="tool-pan" class="seg-btn active" title="拖动平移">✋ 平移</button>
+        <button type="button" id="tool-select" class="seg-btn" title="框选切片区域">⬒ 框选</button>
+      </div>
+      <label class="check"><input type="checkbox" id="grid-toggle" checked /> 坐标网格</label>
+      <button type="button" id="reset-view" class="secondary">重置视图</button>
+    </div>
+  </header>
+
+  <div id="global-error" class="global-error" hidden></div>
+
+  <main class="workspace">
+    <section class="viewer">
+      <div id="canvas-wrap" class="canvas-wrap">
+        <canvas id="canvas"></canvas>
+        <div id="empty-state" class="empty-state">
+          <p>选择本机 FITS 文件，或载入代码生成样本开始。</p>
+          <p class="sub">支持：BITPIX 16 / -32，NAXIS=2，CRPIX+CRVAL+CD 矩阵的 TAN 投影</p>
+        </div>
+        <div id="busy" class="busy" hidden>处理中…</div>
+      </div>
+      <div class="readout" id="readout">
+        <span class="ro-item"><b>像素</b> <em id="ro-pixel">—</em></span>
+        <span class="ro-item"><b>物理值</b> <em id="ro-value">—</em></span>
+        <span class="ro-item"><b>RA</b> <em id="ro-ra">—</em></span>
+        <span class="ro-item"><b>Dec</b> <em id="ro-dec">—</em></span>
+      </div>
+    </section>
+
+    <aside class="panel">
+      <section class="card">
+        <h2>图像信息</h2>
+        <dl id="meta" class="meta">
+          <dt>状态</dt><dd id="meta-status">未加载</dd>
+        </dl>
+      </section>
+
+      <section class="card">
+        <h2>切片参数（服务端天球坐标）</h2>
+        <div class="form">
+          <label>中心赤经 RA (°)
+            <input type="number" id="f-ra" step="0.0001" min="0" max="360" />
+          </label>
+          <label>中心赤纬 Dec (°)
+            <input type="number" id="f-dec" step="0.0001" min="-90" max="90" />
+          </label>
+          <label>角宽 (°)
+            <input type="number" id="f-width" step="0.001" min="0" />
+          </label>
+          <label>角高 (°)
+            <input type="number" id="f-height" step="0.001" min="0" />
+          </label>
+          <div class="row">
+            <label>输出宽 (px)
+              <input type="number" id="f-outw" value="300" min="1" max="4096" step="1" />
+            </label>
+            <label>输出高 (px)
+              <input type="number" id="f-outh" value="300" min="1" max="4096" step="1" />
+            </label>
+          </div>
+          <div class="row">
+            <button type="button" id="preview-btn">更新预览</button>
+            <button type="button" id="download-btn" class="primary">下载切片 FITS</button>
+          </div>
+          <p class="hint" id="pending-hint"></p>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>服务端实际裁切结果</h2>
+        <div class="preview-box">
+          <div class="preview-checker">
+            <img id="preview-img" alt="切片预览（服务端渲染）" hidden />
+            <span id="preview-empty">尚无预览</span>
+          </div>
+        </div>
+        <dl class="meta" id="preview-meta">
+          <dt>预览</dt><dd>等待请求</dd>
+        </dl>
+      </section>
+    </aside>
+  </main>
+
+  <script type="module" src="/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,14 @@
+{
+  "name": "fits-cutout-workbench",
+  "version": "1.0.0",
+  "description": "Local browser workbench for 2-D FITS image inspection and WCS-aware cutout export",
+  "type": "module",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "start": "node server/index.js",
+    "test": "node --test"
+  },
+  "license": "MIT"
+}
