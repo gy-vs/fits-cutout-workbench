@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>FITS 切片工作台</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">FITS 切片工作台</div>
+    <label class="btn primary" id="pickBtn">
+      选择 FITS 文件
+      <input id="fileInput" type="file" accept=".fits,.fit,.fts,application/fits" hidden />
+    </label>
+    <div class="filename" id="fileName" title="未选择文件">未选择文件（仅支持 BITPIX=16/-32、NAXIS=2、CD+TAN）</div>
+    <div class="spacer"></div>
+    <div class="limits" id="limits"></div>
+    <button class="btn ghost" id="releaseBtn" disabled>释放当前文件</button>
+  </header>
+
+  <div class="banner" id="banner" hidden></div>
+
+  <main class="layout">
+    <section class="workspace">
+      <div class="canvas-wrap" id="canvasWrap">
+        <canvas id="mainCanvas"></canvas>
+        <div class="dropzone" id="dropzone">
+          <div class="drop-inner">
+            <div class="drop-title">把 FITS 文件拖到这里，或点击上方“选择 FITS 文件”</div>
+            <div class="drop-sub">文件仅在本机内存中处理；替换文件或关闭页面后立即释放。</div>
+          </div>
+        </div>
+        <div class="hint" id="hint" hidden>
+          滚轮缩放 · 框外拖动平移 · 框内拖动移动切片 · 拖边角手柄改变切片 · Ctrl/⌘+拖动画新框 · 双击复位视图
+        </div>
+      </div>
+      <div class="readout" id="readout">
+        <span class="ro-item">屏幕像素不直接等于天球度数：所有坐标均由服务端 WCS 计算</span>
+      </div>
+    </section>
+
+    <aside class="panel">
+      <section class="card">
+        <h3>鼠标指向（服务端读数）</h3>
+        <div class="kv"><span>像素 (x, y)</span><b id="roPixel">—</b></div>
+        <div class="kv"><span>像素物理值</span><b id="roValue">—</b></div>
+        <div class="kv"><span>赤经 RA</span><b id="roRa">—</b></div>
+        <div class="kv"><span>赤纬 Dec</span><b id="roDec">—</b></div>
+      </section>
+
+      <section class="card">
+        <h3>待导出范围（服务端区域计算）</h3>
+        <div class="grid2">
+          <label>中心 RA°<input type="number" step="any" id="inRa" /></label>
+          <label>中心 Dec°<input type="number" step="any" id="inDec" /></label>
+          <label>角宽 °<input type="number" step="any" id="inW" /></label>
+          <label>角高 °<input type="number" step="any" id="inH" /></label>
+          <label>输出宽 px<input type="number" step="1" min="1" id="inOW" /></label>
+          <label>输出高 px<input type="number" step="1" min="1" id="inOH" /></label>
+        </div>
+        <div class="region-note" id="regionNote"></div>
+        <div class="kv"><span>框选像素范围</span><b id="rectInfo">—</b></div>
+        <div class="kv"><span>建议输出尺寸</span><b id="suggested">—</b></div>
+      </section>
+
+      <section class="card">
+        <h3>服务端实际裁切结果</h3>
+        <div class="preview-wrap">
+          <canvas id="previewCanvas" width="220" height="220"></canvas>
+          <div class="preview-meta" id="previewMeta">尚无数值结果</div>
+        </div>
+        <div class="kv"><span>结果尺寸</span><b id="resSize">—</b></div>
+        <div class="kv"><span>缺失/越界比例</span><b id="resNaN">—</b></div>
+        <div class="kv"><span>输出 CRPIX（已重定位）</span><b id="resCrpix">—</b></div>
+        <div class="kv"><span>服务器坐标回读</span><b id="resCenter">—</b></div>
+        <button class="btn primary full" id="downloadBtn" disabled>下载独立 FITS</button>
+      </section>
+    </aside>
+  </main>
+  <script type="module" src="/app.js"></script>
+</body>
+</html>
